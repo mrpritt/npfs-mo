@@ -4,7 +4,7 @@ This repository contains detailed results and code for the paper [Non-permutatio
 
 ## Detailed results
 
-The detailed results can be found in folder [data](data). In the folder you also can find a [R notebook](data/tables.Rmd) to reproduce the tables, including a [rendered version in HTML](data/tables.html).
+The detailed results can be found in folder [data](data). In the folder you also can find a [R notebook](data/tables.Rmd) to reproduce the tables, including a [rendered version in HTML](https://raw.githack.com/mrpritt/npfs-mo/main/data/tables.html).
 
 ## Code
 
