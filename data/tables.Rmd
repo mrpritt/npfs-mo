@@ -1,0 +1,107 @@
+---
+title: "Reproducing experimental data in of \"Effective heuristics for permutation
+  and non-permutation flow shop scheduling with missing operations\""
+output:
+  html_document:
+    df_print: paged
+---
+
+This notebook shows how the summarized tables in the published paper can be reproduced from the detailed experimental data provided in this repository.
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse, quietly = TRUE)
+library(here)
+library(glue)
+library(knitr)
+library(kableExtra)
+n_names = c("$5$", "$10$", "$20$", "$30$", "$50$", "$100$")
+```
+
+## Table 2 
+```{r message = FALSE}
+t2 = read_csv(here("data/table2.csv"))
+tb = t2 %>% mutate(epj = n*((1-d)*(1-d)+d*(1-d)*m)) %>% group_by(d, n, m) %>% summarise(across(epj, mean)) %>% pivot_wider(names_from = d, values_from = c(epj)) %>% ungroup()
+tb=bind_cols(tb[1:12,],tb[13:24,])
+tb %>% kable(caption = glue("Average number of pseudo jobs of all instance groups with a different number of jobs n and machines m. Each group has 30 instances."), col.names = rep(c("$n$", "$m/r$", "$0.2$", "$0.3$", "$0.4$"),2)) %>% kable_styling()
+```
+
+## Table 3
+
+```{r message = FALSE}
+twosa = read_csv(here("data/table3-2sa.csv"))
+iga = read_csv(here("data/table3-iga.csv"))
+bkv = read_csv(here("data/table3-bkv.csv"))
+
+t3 = twosa %>% inner_join(iga) %>% inner_join(bkv) %>% mutate(across(ends_with(".ft"),~rd(.x,bkv))) %>% group_by(d,n,m) %>% summarize(across(c(saf.ft:igapols.ft),mean)) %>% pivot_wider(names_from=n,values_from=c(ends_with(".ft")))
+t3.sum = t3 %>% ungroup() %>% summarize(across(saf.ft_5:igapols.ft_100,function(x) { mean(x,na.rm=T) }))
+t3 = t3 %>% bind_rows(t3.sum)
+t3 %>% kable(caption = glue("Relative deviations from the best known values for 2SA and IGA."), col.names = c("$d$", "$m/n$", rep(n_names,2))) %>% kable_styling()
+```
+
+
+## Table 4
+
+```{r message = FALSE}
+twosa = read_csv(here("data/table4-2sa.csv"))
+iga = read_csv(here("data/table4-iga.csv"))
+
+t4 = twosa %>% inner_join(iga) %>% rename(time.t=time) %>% mutate(across(ends_with(".ft"),~rd(.x,bkv))) %>% group_by(n,m) %>% summarize(across(c(saf.t:time.t),mean)) %>% pivot_wider(names_from=n,values_from=c(ends_with(".t")))
+t4.sum = t4 %>% summarize(across(saf.t_5:time.t_100,function(x) { mean(x,na.rm=T) }))
+t4 = t4 %>% bind_rows(t4.sum)
+t4 %>% kable(caption = glue("Computation times for 2SA and IGA."), col.names = c("$m/n$", rep(n_names,2))) %>% kable_styling()
+```
+
+## Table 5
+
+```{r message = FALSE}
+mip = read_csv(here("data/table5-mip.csv"))
+iga = read_csv(here("data/table3-iga.csv")) %>% rename(igapols.0.1.ft=igapols.ft)
+igap = read_csv(here("data/table5-iga-plus.csv"))
+bkv = read_csv(here("data/table3-bkv.csv"))
+
+t5 = mip %>% inner_join(iga) %>% inner_join(igap) %>% inner_join(bkv) %>% mutate(across(ends_with(".ft"),~rd(.x,bkv))) %>% group_by(n,m,d) %>% summarize(across(ends_with(".ft"),mean)) %>% pivot_wider(names_from=n,values_from=c(ends_with(".ft")))
+t5.sum = t5 %>% ungroup() %>% summarize(across(contains(".ft_"),function(x) { mean(x,na.rm=T) }))
+t5 = t5 %>% bind_rows(t5.sum)
+t5 %>% kable(caption = glue("Comparison of the solution of the MIP model with those of IGA and IGA running with a ﬁve times higher iteration limit (IGA+)."), col.names = c("$m$", "$d/n$", rep(n_names[1:5],3))) %>% kable_styling()
+```
+
+## Figure 4
+
+```{r message = FALSE}
+twosa = read_csv(here("data/table4-2sa.csv"))
+iga = read_csv(here("data/table4-iga.csv"))
+f4 = twosa %>% inner_join(iga) %>% rename(time.t=time)
+scientific_10 <- function(x) {
+  parse(text=gsub("e", " %*% 10^", scales::scientific_format()(x)))
+}
+ggplot(f4,aes(x=saf.t,y=time.t)) + geom_point() + geom_abline() + scale_x_log10(label=scientific_10) + scale_y_log10(label=scientific_10) + labs(title="Computation times (s)", x="2SA", y="IGA") + theme(legend.position="none")
+```
+
+## Table 6
+
+```{r message = FALSE}
+t6 = read_csv(here("data/table6.csv")) %>% inner_join(read_csv(here("data/table3-bkv.csv")))
+t6 = t6 %>% mutate(across(ends_with(".ft"),~rd(.x,bkv))) %>% group_by(d,n,m) %>% summarize(across(c(ends_with(".ft")),mean)) %>% pivot_wider(names_from=n,values_from=c(ends_with(".ft")))
+t6.sum = t6 %>% ungroup() %>% summarize(across(contains(".ft_"),function(x) { mean(x,na.rm=T) }))
+t6 = t6 %>% bind_rows(t6.sum)
+t6 %>% kable(caption = glue("Relative deviations from the best known values for IGA0 and IGA+NPSset."), col.names = c("$d$", "$m/n$", rep(n_names,2))) %>% kable_styling()
+```
+
+## Table 7
+
+```{r message = FALSE}
+t7 = read_csv(here("data/table7.csv")) %>% group_by(n,m) %>% summarize(b=100*mean(bs),B=100*max(bs),jri=100*mean(jri)) %>% pivot_wider(names_from=m,values_from=c(b,B,jri)) 
+t7.sum = t7 %>% ungroup() %>% summarize(across(contains("_"),function(x) { mean(x,na.rm=T) }))
+t7 = t7 %>% bind_rows(t7.sum)
+t7 %>% kable(caption = glue("Average and maximum buffer sizes and job reordering index (in percent) for the non-permutation solutions."), col.names = c("$m/n$", rep(n_names[1:4],3))) %>% kable_styling()
+```
+
+## Table 8
+
+```{r message = FALSE}
+t8 = read_csv(here("data/table8.csv")) %>% group_by(n,m) %>% summarize(b=100*mean(bs),B=100*max(bs),jri=100*mean(jri)) %>% pivot_wider(names_from=m,values_from=c(b,B,jri))
+t8.sum = t8 %>% ungroup() %>% summarize(across(contains("_"),function(x) { mean(x,na.rm=T) }))
+t8 = t8 %>% bind_rows(t8.sum)
+t8 %>% kable(caption = glue("Average and maximum buffer sizes and job reordering index (in percent) for the permutation solutions."), col.names = c("$n/m$", rep(n_names[1:4],3))) %>% kable_styling()
+```
