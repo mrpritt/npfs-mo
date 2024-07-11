@@ -30,7 +30,7 @@ void EPSolution::update_heads(unsigned kb, unsigned ke) {
   }
 }
 
-void EPSolution::update_heads_flowtimes(unsigned kb, unsigned ke, vector<Time>& ft) {
+void EPSolution::update_heads_flowtimes(unsigned kb, unsigned ke, vector<Time> &ft) {
   for (unsigned k = kb; k != ke; ++k) {
     Time Ck = 0;
     for (unsigned i = 1; i <= m; ++i) {
@@ -110,7 +110,6 @@ void EPSolution::insert_all_ms() {
       update_tails(fbegin - bp, fbegin);
     }
     assert(makespan_valid(Cm));
-
   }
   assert(makespan_valid(Cm));
   of = Cm;
@@ -120,7 +119,6 @@ void EPSolution::insert_all_ft() {
   vector<Time> ftk(I.n + 1, 0);
   update_heads_flowtimes(1, fbegin, ftk);
   update_tails(1, fbegin);
-
 
   Time Cm = 0, Cf = 0;
   for (auto πend = π.size(); fbegin != πend;) {
@@ -135,10 +133,10 @@ void EPSolution::insert_all_ft() {
 
       Time Cj = 0;
       for (unsigned i = 1; i <= m; ++i) {
-	if (I.p[jb][i] > 0)
-	  C[i] = Cj = std::max(Cj, h[i][k - 1]) + I.p[jb][i];
-	else
-	  C[i] = h[i][k - 1];
+        if (I.p[jb][i] > 0)
+          C[i] = Cj = std::max(Cj, h[i][k - 1]) + I.p[jb][i];
+        else
+          C[i] = h[i][k - 1];
       }
       fk += Cj;
       if (fk > Cf)
@@ -175,7 +173,6 @@ void EPSolution::insert_all_ft() {
     }
 
     assert(flowtime_valid(Cf));
-
   }
   assert(flowtime_valid(Cf));
   of = Cf;
@@ -291,7 +288,7 @@ struct NPMove {
   int i;
   Time Csum, Cmax;
 
-  void update(const NPMove& cm) {
+  void update(const NPMove &cm) {
     if (cm.Csum < Csum || (cm.Csum == Csum && cm.Cmax < Cmax)) {
       *this = cm;
     }
@@ -303,15 +300,16 @@ void ENPSolution::insert_all_ft() {
 
   for (auto πend = π.shape()[1]; fbegin != πend;) {
     for (unsigned k = fbegin++; k > 0; --k) {
-      auto [Cmax,Csum] = compute_ms_ft_mo(I);
+      auto [Cmax, Csum] = compute_ms_ft_mo(I);
       bm.update(NPMove{k, 0, Csum, Cmax});
 
-      if (k == 1) break;
+      if (k == 1)
+        break;
 
       for (unsigned l = m; l != 1; --l) {
-	::swap(π[l][k - 1], π[l][k]);
-	auto [Cmax,Csum] = compute_ms_ft_mo(I);
-	bm.update(NPMove{k, -int(l), Csum, Cmax});
+        ::swap(π[l][k - 1], π[l][k]);
+        auto [Cmax, Csum] = compute_ms_ft_mo(I);
+        bm.update(NPMove{k, -int(l), Csum, Cmax});
       }
       ::swap(π[1][k - 1], π[1][k]);
     }
@@ -321,9 +319,9 @@ void ENPSolution::insert_all_ft() {
 
     for (unsigned k = fbegin++; k > 1; --k) {
       for (unsigned l = 1; l < m; ++l) {
-	::swap(π[l][k - 1], π[l][k]);
-	auto [Cmax,Csum] = compute_ms_ft_mo(I);
-	bm.update(NPMove{k, int(l+1), Csum, Cmax});
+        ::swap(π[l][k - 1], π[l][k]);
+        auto [Cmax, Csum] = compute_ms_ft_mo(I);
+        bm.update(NPMove{k, int(l + 1), Csum, Cmax});
       }
       ::swap(π[m][k - 1], π[m][k]);
     }
@@ -332,32 +330,32 @@ void ENPSolution::insert_all_ft() {
     fbegin--;
 
     if (bm.i < 0) {
-      for(auto i = 1u; i < unsigned(-bm.i); ++i) {
-	rotate(π[i].begin() + bm.k, π[i].begin() + fbegin, π[i].begin() + fbegin + 1);
-	for(auto k = bm.k; k != fbegin + 1; ++k)
-	  ρ[i][π[i][k]] = k;
+      for (auto i = 1u; i < unsigned(-bm.i); ++i) {
+        rotate(π[i].begin() + bm.k, π[i].begin() + fbegin, π[i].begin() + fbegin + 1);
+        for (auto k = bm.k; k != fbegin + 1; ++k)
+          ρ[i][π[i][k]] = k;
       }
-      for(auto i = -unsigned(bm.i); i <= m; ++i) {
-	rotate(π[i].begin() + bm.k - 1, π[i].begin() + fbegin, π[i].begin() + fbegin + 1);
-	for(auto k = bm.k - 1; k != fbegin + 1; ++k)
-	  ρ[i][π[i][k]] = k;
+      for (auto i = -unsigned(bm.i); i <= m; ++i) {
+        rotate(π[i].begin() + bm.k - 1, π[i].begin() + fbegin, π[i].begin() + fbegin + 1);
+        for (auto k = bm.k - 1; k != fbegin + 1; ++k)
+          ρ[i][π[i][k]] = k;
       }
     } else if (bm.i == 0) {
-      for(auto i = 1u; i <= I.m; ++i) {
-	rotate(π[i].begin() + bm.k, π[i].begin() + fbegin, π[i].begin() + fbegin + 1);
-	for(auto k = bm.k; k != fbegin + 1; ++k)
-	  ρ[i][π[i][k]] = k;
+      for (auto i = 1u; i <= I.m; ++i) {
+        rotate(π[i].begin() + bm.k, π[i].begin() + fbegin, π[i].begin() + fbegin + 1);
+        for (auto k = bm.k; k != fbegin + 1; ++k)
+          ρ[i][π[i][k]] = k;
       }
     } else {
-      for(auto i = 1u; i < unsigned(bm.i); ++i) {
-	rotate(π[i].begin() + bm.k - 1, π[i].begin() + fbegin, π[i].begin() + fbegin + 1);
-	for(auto k = bm.k - 1; k != fbegin + 1; ++k)
-	  ρ[i][π[i][k]] = k;
+      for (auto i = 1u; i < unsigned(bm.i); ++i) {
+        rotate(π[i].begin() + bm.k - 1, π[i].begin() + fbegin, π[i].begin() + fbegin + 1);
+        for (auto k = bm.k - 1; k != fbegin + 1; ++k)
+          ρ[i][π[i][k]] = k;
       }
-      for(auto i = unsigned(bm.i); i <= m; ++i) {
-	rotate(π[i].begin() + bm.k, π[i].begin() + fbegin, π[i].begin() + fbegin + 1);
-	for(auto k = bm.k; k != fbegin + 1; ++k)
-	  ρ[i][π[i][k]] = k;
+      for (auto i = unsigned(bm.i); i <= m; ++i) {
+        rotate(π[i].begin() + bm.k, π[i].begin() + fbegin, π[i].begin() + fbegin + 1);
+        for (auto k = bm.k; k != fbegin + 1; ++k)
+          ρ[i][π[i][k]] = k;
       }
     }
     of = bm.Csum;

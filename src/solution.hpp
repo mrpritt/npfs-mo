@@ -93,16 +93,16 @@ struct PSolution : public Solution {
   }
   std::pair<Time, Time> evaluateNPSset(const Instance &I, bool = false) const;
 
-  Result getResult(const Instance& I);
+  Result getResult(const Instance &I);
   Time getMakespan(const Instance &I) { return compute_ms_ft_mo(I).first; }
   Time getFlowtime(const Instance &I) { return compute_ms_ft_mo(I).second; }
 
   std::string to_string() const;
 
-  unsigned computeBufferspace(const Instance& I) const;
-  
-  void compute_completion_times(const Instance &, boost::multi_array<Time,2> &, boost::multi_array<Time,2> &) const;
-  void compute_completion_times(const Instance &, boost::multi_array<Time,2> &) const;
+  unsigned computeBufferspace(const Instance &I) const;
+
+  void compute_completion_times(const Instance &, boost::multi_array<Time, 2> &, boost::multi_array<Time, 2> &) const;
+  void compute_completion_times(const Instance &, boost::multi_array<Time, 2> &) const;
 
   bool isValid() const { return of < infinite_time; }
 
@@ -114,7 +114,7 @@ struct NPSolution : public Solution {
   typedef Solution Base;
 
   boost::multi_array<Job, 2> π; // permutations of jobs, i=1:m, j=1:n
-  unsigned fbegin;		// by convention: fbegin,... all stored straight.
+  unsigned fbegin;              // by convention: fbegin,... all stored straight.
 
   NPSolution(const Instance &I) : Base(I), π(boost::extents[I.m + 1][I.n + 1]), fbegin(I.n + 1) {
     for (auto i = 1u; i <= I.m; ++i)
@@ -122,7 +122,7 @@ struct NPSolution : public Solution {
         π[i][j] = j;
   }
 
-  NPSolution(const Instance &I, const PSolution& P) : Base(Solution(P)), π(boost::extents[I.m + 1][I.n + 1]), fbegin(I.n + 1) {
+  NPSolution(const Instance &I, const PSolution &P) : Base(Solution(P)), π(boost::extents[I.m + 1][I.n + 1]), fbegin(I.n + 1) {
     for (auto i = 1u; i <= I.m; ++i)
       for (auto j = 1u; j <= I.n; ++j)
         π[i][j] = P.π[j];
@@ -162,12 +162,18 @@ struct NPSolution : public Solution {
   Time getMakespan(const Instance &I) { return compute_ms_ft_mo(I).first; }
   Time getFlowtime(const Instance &I) { return compute_ms_ft_mo(I).second; }
 
-  unsigned computeBufferspace(const Instance& I) const;
-  double computeJRI(const Instance& I) const;
-  unsigned jobIndex(unsigned i, Job j) const { unsigned k = 1; while (k <= n && π[i][k] != j) ++k; assert(k <= n); return k; }
-  
-  void compute_completion_times(const Instance&, boost::multi_array<Time,2> &, boost::multi_array<Time,2> &, std::vector<unsigned>&, std::vector<Time>&) const;
-  void compute_completion_times(const Instance &, boost::multi_array<Time,2> &) const;
+  unsigned computeBufferspace(const Instance &I) const;
+  double computeJRI(const Instance &I) const;
+  unsigned jobIndex(unsigned i, Job j) const {
+    unsigned k = 1;
+    while (k <= n && π[i][k] != j)
+      ++k;
+    assert(k <= n);
+    return k;
+  }
+
+  void compute_completion_times(const Instance &, boost::multi_array<Time, 2> &, boost::multi_array<Time, 2> &, std::vector<unsigned> &, std::vector<Time> &) const;
+  void compute_completion_times(const Instance &, boost::multi_array<Time, 2> &) const;
 
   bool isValid() const { return of < infinite_time; }
 };

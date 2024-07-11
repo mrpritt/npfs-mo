@@ -4,13 +4,13 @@
  */
 #include "instance.hpp"
 
-#include <string>
 #include <set>
+#include <string>
 using namespace std;
 
 #define FMT_HEADER_ONLY
-#include "fmt/format.h"
 #include "fmt/color.h"
+#include "fmt/format.h"
 #include "fmt/ostream.h"
 #include "fmt/ranges.h"
 
@@ -41,7 +41,7 @@ void Instance::compute_auxiliary_data() {
   for (unsigned j = 1; j <= n; ++j)
     for (unsigned i = 1; i <= m; ++i)
       if (p[j][i] != 0)
-	++oeff;
+        ++oeff;
 }
 
 vector<Time> Instance::totalTimes() const {
@@ -66,37 +66,37 @@ unsigned Instance::numPseudojobs() const {
     bool missing = true;
     for (unsigned i = 1; i <= m; ++i) {
       if (missing && p[j][i] != 0)
-	++pj;
+        ++pj;
       missing = p[j][i] == 0;
     }
   }
   return pj;
 }
 
-void compute_inverse(const vector<Job>& π, vector<Job>& π⁻) {
+void compute_inverse(const vector<Job> &π, vector<Job> &π⁻) {
   assert(π.size() > 0);
   π⁻.resize(*max_element(π.begin(), π.end()) + 1);
-  for(unsigned k = 1, ke = π.size(); k != ke; ++k)
-    π⁻[π[k]]=k;
+  for (unsigned k = 1, ke = π.size(); k != ke; ++k)
+    π⁻[π[k]] = k;
 }
 
-unsigned kendall_tau(const vector<Job>& π, const vector<Job>& σ) {
-  assert(set(π.begin(),π.end()) == set(σ.begin(), σ.end()));
+unsigned kendall_tau(const vector<Job> &π, const vector<Job> &σ) {
+  assert(set(π.begin(), π.end()) == set(σ.begin(), σ.end()));
   if (π.size() == 0)
     return 0;
-  
+
   vector<Job> π⁻, σ⁻;
   compute_inverse(π, π⁻);
   compute_inverse(σ, σ⁻);
 
   const unsigned ke = π.size();
   unsigned kt = 0;
-  for(unsigned k1 = 1; k1 != ke; ++k1) {
+  for (unsigned k1 = 1; k1 != ke; ++k1) {
     const Job j1 = π[k1];
-    for(unsigned k2 = k1 + 1; k2 != ke; ++k2) {
+    for (unsigned k2 = k1 + 1; k2 != ke; ++k2) {
       const Job j2 = π[k2];
-      if ((π⁻[j1]<π⁻[j2] && σ⁻[j1]>σ⁻[j2]) || (π⁻[j1]>π⁻[j2] && σ⁻[j1]<σ⁻[j2]))
-	kt++;
+      if ((π⁻[j1] < π⁻[j2] && σ⁻[j1] > σ⁻[j2]) || (π⁻[j1] > π⁻[j2] && σ⁻[j1] < σ⁻[j2]))
+        kt++;
     }
   }
   return kt;

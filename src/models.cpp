@@ -11,20 +11,9 @@ using namespace std;
 
 #include "logging.hpp"
 
-map<IloAlgorithm::Status,string>
-status_string = {
-		 { IloAlgorithm::Unknown, "Unknown" },
-		 { IloAlgorithm::Feasible, "Feasible" },
-		 { IloAlgorithm::Optimal, "Optimal" },
-		 { IloAlgorithm::Infeasible, "Infeasible" },
-		 { IloAlgorithm::Unbounded, "Unbounded" },
-		 { IloAlgorithm::InfeasibleOrUnbounded, "InfeasibleOrUnbounded" },
-		 { IloAlgorithm::Error, "Error" }
-};
+map<IloAlgorithm::Status, string> status_string = {{IloAlgorithm::Unknown, "Unknown"}, {IloAlgorithm::Feasible, "Feasible"}, {IloAlgorithm::Optimal, "Optimal"}, {IloAlgorithm::Infeasible, "Infeasible"}, {IloAlgorithm::Unbounded, "Unbounded"}, {IloAlgorithm::InfeasibleOrUnbounded, "InfeasibleOrUnbounded"}, {IloAlgorithm::Error, "Error"}};
 
-string to_string(IloAlgorithm::Status status) {
-  return status_string[status];
-}
+string to_string(IloAlgorithm::Status status) { return status_string[status]; }
 
 void setupSolver(IloCplex solver, const ModelOptions &m) {
   IloEnv env = solver.getEnv();
@@ -45,18 +34,18 @@ void MPFSMO::addVars() {
       obj.setLinearCoef(C[C.getSize() - 1], 1.0 / (Csum * Csum));
     }
   idx_c = C.getSize();
-  C.add(IloNumVar(env, 0.0, IloInfinity, ILOFLOAT)); 
+  C.add(IloNumVar(env, 0.0, IloInfinity, ILOFLOAT));
   C[idx_c].setName("Csum");
   obj.setLinearCoef(C[idx_c], 1.0);
 
   for (unsigned i = 0u; i != I.m; ++i)
     for (unsigned j1 = 0; j1 != I.n; ++j1)
       for (unsigned j2 = 0; j2 != I.n; ++j2)
-	if (j1 != j2) {
-	  x.add(IloNumVar(env, 0.0, 1.0, ILOINT));
-	  x[x.getSize() - 1].setName(fmt::format("x[{},{},{}]", i + 1, j1 + 1, j2 + 1).c_str());
-	  idx[{i, j1, j2}] = x.getSize() - 1;
-	}
+        if (j1 != j2) {
+          x.add(IloNumVar(env, 0.0, 1.0, ILOINT));
+          x[x.getSize() - 1].setName(fmt::format("x[{},{},{}]", i + 1, j1 + 1, j2 + 1).c_str());
+          idx[{i, j1, j2}] = x.getSize() - 1;
+        }
 }
 
 void MPFSMO::addCompletion(Time ub_cmax) {
@@ -68,8 +57,8 @@ void MPFSMO::addCompletion(Time ub_cmax) {
       Time pij = I.p[j + 1][i + 1];
       if (pij == 0)
         continue;
-      const double Mij = ub_cmax; 
-      
+      const double Mij = ub_cmax;
+
       for (unsigned j2 = 0; j2 != I.n; j2++) {
         if (j2 == j)
           continue;
@@ -77,9 +66,9 @@ void MPFSMO::addCompletion(Time ub_cmax) {
         back++;
         completion[back].setLinearCoef(C[i * I.n + j], 1.0);
         completion[back].setLinearCoef(C[i * I.n + j2], -1.0);
-        completion[back].setLinearCoef(x[idx[{mach,j2, j}]], -Mij);
+        completion[back].setLinearCoef(x[idx[{mach, j2, j}]], -Mij);
       }
-      
+
       unsigned i2 = i;
       while (i2 > 0) {
         i2--;
@@ -88,7 +77,7 @@ void MPFSMO::addCompletion(Time ub_cmax) {
           back++;
           completion[back].setLinearCoef(C[i * I.n + j], 1.0);
           completion[back].setLinearCoef(C[i2 * I.n + j], -1.0);
-	  break;
+          break;
         }
       }
     }
@@ -98,8 +87,9 @@ void MPFSMO::addCompletion(Time ub_cmax) {
   back++;
   completion[back].setLinearCoef(C[idx_c], 1.0);
   for (unsigned j = 0; j != I.n; ++j) {
-    int i = I.lastOperation(j + 1) ;
-    if (i-- == 0) continue;
+    int i = I.lastOperation(j + 1);
+    if (i-- == 0)
+      continue;
     completion[back].setLinearCoef(C[i * I.n + j], -1.0);
   }
 
@@ -113,10 +103,10 @@ void MPFSMO::addPrecedences() {
   for (unsigned i = 0u; i != I.m; ++i)
     for (unsigned j1 = 0; j1 != I.n; ++j1)
       for (unsigned j2 = j1 + 1; j2 != I.n; ++j2) {
-	precedences.add(IloRange(env, 1.0, 1.0, fmt::format("P{}{}", j1 + 1, j2 + 1).c_str()));
-	back++;
-	precedences[back].setLinearCoef(x[idx[{i, j1, j2}]], 1.0);
-	precedences[back].setLinearCoef(x[idx[{i, j2, j1}]], 1.0);
+        precedences.add(IloRange(env, 1.0, 1.0, fmt::format("P{}{}", j1 + 1, j2 + 1).c_str()));
+        back++;
+        precedences[back].setLinearCoef(x[idx[{i, j1, j2}]], 1.0);
+        precedences[back].setLinearCoef(x[idx[{i, j2, j1}]], 1.0);
       }
 
   model.add(precedences);
@@ -141,7 +131,7 @@ void MPFSMO::setSolution(IloCplex solver, const PSolution &S) {
       auto j1 = S.π[i1] - 1;
       auto j2 = S.π[i2] - 1;
       for (unsigned i = 0u; i != I.m; ++i)
-	v[idx[{i, j1, j2}]] = 1.0;
+        v[idx[{i, j1, j2}]] = 1.0;
     }
   solver.addMIPStart(x, v);
   v.end();
@@ -155,9 +145,9 @@ void MPFSMO::setSolution(IloCplex solver, const NPSolution &S) {
   for (unsigned i = 0u; i != I.m; ++i)
     for (auto i1 = 1u; i1 <= I.n; ++i1)
       for (auto i2 = i1 + 1; i2 <= I.n; ++i2) {
-	auto j1 = S.π[i + 1][i1] - 1;
-	auto j2 = S.π[i + 1][i2] - 1;
-	v[idx[{i, j1, j2}]] = 1.0;
+        auto j1 = S.π[i + 1][i1] - 1;
+        auto j2 = S.π[i + 1][i2] - 1;
+        v[idx[{i, j1, j2}]] = 1.0;
       }
   solver.addMIPStart(x, v);
   v.end();
@@ -182,7 +172,7 @@ NPSolution MPFSMO::getSolution(IloCplex solver) {
 
 ModelStat MPFSMO::getStatistics() const { return mstat; }
 
-pair<NPSolution,IloAlgorithm::Status> MPFSMO::solve(const PSolution &S) {
+pair<NPSolution, IloAlgorithm::Status> MPFSMO::solve(const PSolution &S) {
   IloCplex solver(model);
   if (m.exportModel)
     solver.exportModel("model.lp");
@@ -195,5 +185,5 @@ pair<NPSolution,IloAlgorithm::Status> MPFSMO::solve(const PSolution &S) {
   if (status == IloAlgorithm::Feasible || status == IloAlgorithm::Optimal)
     return {getSolution(solver), status};
   else
-    return {NPSolution(I,S), status};
+    return {NPSolution(I, S), status};
 }

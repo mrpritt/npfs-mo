@@ -30,7 +30,7 @@ struct ModelOptions {
 
 struct ModelStat {
   unsigned rows, cols, nnz;
-  std::string to_string() { return fmt::format("{} {} {}", rows, cols, nnz);}
+  std::string to_string() { return fmt::format("{} {} {}", rows, cols, nnz); }
 };
 
 struct MPFSMO {
@@ -59,5 +59,5 @@ struct MPFSMO {
   NPSolution getSolution(IloCplex);
   ModelStat getStatistics() const;
 
-  std::pair<NPSolution,IloAlgorithm::Status> solve(const PSolution &);
+  std::pair<NPSolution, IloAlgorithm::Status> solve(const PSolution &);
 };

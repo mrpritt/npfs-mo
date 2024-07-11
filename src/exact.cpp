@@ -2,10 +2,10 @@
  * \file exact.cpp
  *   \author Marcus Ritt <marcus.ritt@inf.ufrgs.br>
  */
-#include <iostream>
 #include <cassert>
 #include <cstdlib>
 #include <filesystem>
+#include <iostream>
 namespace fs = std::filesystem;
 
 using namespace std;
@@ -96,7 +96,7 @@ int main(int argc, char *argv[]) {
 
   IloAlgorithm::Status status = IloAlgorithm::Unknown;
   NPSolution Sm(I);
-  tie(Sm,status) = m.solve(S);
+  tie(Sm, status) = m.solve(S);
   results.push_back(Result{Sm.getMakespan(I), Sm.of, run::elapsed()});
   vprint(1, "Model results {}\n", results.back().to_string());
   mstat = m.getStatistics();

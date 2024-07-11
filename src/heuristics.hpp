@@ -39,7 +39,7 @@ struct EPSolution : public PSolution {
   EPSolution(const Instance &I, const Base &S) : Base(S), I(I), of_makespan(true) {}
 
   void update_heads(unsigned, unsigned);
-  void update_heads_flowtimes(unsigned, unsigned, std::vector<Time>&);
+  void update_heads_flowtimes(unsigned, unsigned, std::vector<Time> &);
   void update_tails(unsigned, unsigned);
   bool makespan_valid(Time);
   bool flowtime_valid(Time);
@@ -54,7 +54,12 @@ struct EPSolution : public PSolution {
       so = SSolution{π, sof, run::elapsed()};
   }
   void totalTimeOrder();
-  void insert_all() { if (of_makespan) insert_all_ms(); else insert_all_ft(); }
+  void insert_all() {
+    if (of_makespan)
+      insert_all_ms();
+    else
+      insert_all_ft();
+  }
   void insert_all_ms();
   void insert_all_ft();
   void shuffle_free();
@@ -75,7 +80,7 @@ struct ENPSolution : public NPSolution {
 
   ENPSolution(const Instance &I) : Base(I), I(I), tfound(0.0), ρ(boost::extents[m + 1][n + 1]), S₀(nullptr) { compute_ρ(); }
   ENPSolution(const Instance &I, const Base &S) : Base(S), I(I), tfound(0.0), ρ(boost::extents[m + 1][n + 1]), S₀(nullptr) { compute_ρ(); }
-  ENPSolution(const Instance &I, const EPSolution &S) : Base(I,PSolution(S)), I(I), tfound(0.0), ρ(boost::extents[m + 1][n + 1]), S₀(nullptr) { compute_ρ(); }
+  ENPSolution(const Instance &I, const EPSolution &S) : Base(I, PSolution(S)), I(I), tfound(0.0), ρ(boost::extents[m + 1][n + 1]), S₀(nullptr) { compute_ρ(); }
 
   ENPSolution(ENPSolution &&other) : Base(other), I(other.I) { this->swap(other); }
 
@@ -102,7 +107,11 @@ struct ENPSolution : public NPSolution {
   Result getResultPO();
   void store_so() {}
   void push_po() { S₀ = new ENPSolution(*this); }
-  void pop_po() { *this = *S₀; delete S₀; S₀ = nullptr; }
+  void pop_po() {
+    *this = *S₀;
+    delete S₀;
+    S₀ = nullptr;
+  }
 
   void clear();
   void insert_all() { insert_all_ft(); }

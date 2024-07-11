@@ -10,7 +10,7 @@ The detailed results can be found in folder [data](data). In the folder you also
 
 The code is contained in the folder `src`. To compile, clone the repo, and use
 ```bash
-cd npfs-mo
+cd npfs-mo/build
 git submodule update --init 
 cmake -DCMAKE_BUILD_TYPE=Release ../src
 make

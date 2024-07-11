@@ -41,9 +41,24 @@ struct Instance {
   unsigned numEffectiveOperations() const { return oeff; }
   unsigned numPseudojobs() const;
 
-  unsigned firstOperation(Job j) const { unsigned o = 1; while (o <= m && p[j][o] == 0) ++o; return o; }
-  unsigned nextOperation(unsigned i, Job j) const { unsigned o = i + 1; while (o <= m && p[j][o] == 0) ++o; return o; }
-  unsigned lastOperation(Job j) const { unsigned o = m; while (p[j][o] == 0 && o>0) --o; return o; }
+  unsigned firstOperation(Job j) const {
+    unsigned o = 1;
+    while (o <= m && p[j][o] == 0)
+      ++o;
+    return o;
+  }
+  unsigned nextOperation(unsigned i, Job j) const {
+    unsigned o = i + 1;
+    while (o <= m && p[j][o] == 0)
+      ++o;
+    return o;
+  }
+  unsigned lastOperation(Job j) const {
+    unsigned o = m;
+    while (p[j][o] == 0 && o > 0)
+      --o;
+    return o;
+  }
 };
 
-unsigned kendall_tau(const std::vector<Job>&, const std::vector<Job>&);
+unsigned kendall_tau(const std::vector<Job> &, const std::vector<Job> &);

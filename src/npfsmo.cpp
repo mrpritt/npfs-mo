@@ -12,8 +12,8 @@
 namespace fs = std::filesystem;
 using namespace std;
 
-#include "heuristics.hpp"
 #include "helpers.hpp"
+#include "heuristics.hpp"
 #include "instance.hpp"
 #include "logging.hpp"
 #include "options.hpp"
@@ -43,30 +43,17 @@ void add_results(vector<Time> &v, const pair<Time, Time> &tt) {
 int main(int argc, char *argv[]) {
   run::start.reset();
 
-  
   IGAOptions iopt;
   std_description desc("Options", opt);
-  
-  desc.add_options()
-    ("timelimit",    po::value<double>(&opt.timelimit)->default_value(0.0),    "Time limit for heuristics (seconds; default 5ms/op, negative for none).")
-    ("iterlimit",    po::value<int>(&opt.iterlimit)->default_value(0.0),       "Iteration limit for heuristics (default 1.5×10⁵/n, negative for none).")
-    ("iterfactor",   po::value<double>(&opt.iterfactor)->default_value(1.0),   "Multiplier for default iteration limit (which has been calibrated for about 5ms/op)")
-    ("flowtime",     po::bool_switch(&opt.flowtime)->default_value(false),     "Make flowtime the primary objective.")
-    ("npfs",         po::bool_switch(&opt.npfs)->default_value(false),         "Apply NPFS optimizations.")
-    ;
+
+  desc.add_options()("timelimit", po::value<double>(&opt.timelimit)->default_value(0.0), "Time limit for heuristics (seconds; default 5ms/op, negative for none).")("iterlimit", po::value<int>(&opt.iterlimit)->default_value(0.0), "Iteration limit for heuristics (default 1.5×10⁵/n, negative for none).")("iterfactor", po::value<double>(&opt.iterfactor)->default_value(1.0), "Multiplier for default iteration limit (which has been calibrated for about 5ms/op)")("flowtime", po::bool_switch(&opt.flowtime)->default_value(false), "Make flowtime the primary objective.")("npfs", po::bool_switch(&opt.npfs)->default_value(false), "Apply NPFS optimizations.");
 
   po::options_description iga("IGA options", get_terminal_width());
-  iga.add_options()
-    ("alpha",        po::value<double>(&iopt.alpha)->default_value(0.234375), "Alpha.")
-    ("dc",           po::value<unsigned>(&iopt.dc)->default_value(8),         "D&C jobs.")
-    ;
+  iga.add_options()("alpha", po::value<double>(&iopt.alpha)->default_value(0.234375), "Alpha.")("dc", po::value<unsigned>(&iopt.dc)->default_value(8), "D&C jobs.");
 
   po::options_description out("Output options", get_terminal_width());
-  out.add_options()
-    ("psolution",     po::value<string>(&opt.wpsolution)->default_value("/dev/null"), "File to write permutation solution to.")
-    ("solution",      po::value<string>(&opt.solution)->default_value("/dev/null"), "File to write last solution to.")
-    ;
-  
+  out.add_options()("psolution", po::value<string>(&opt.wpsolution)->default_value("/dev/null"), "File to write permutation solution to.")("solution", po::value<string>(&opt.solution)->default_value("/dev/null"), "File to write last solution to.");
+
   desc.add(iga).add(out);
 
   po::positional_options_description pod;
@@ -92,7 +79,7 @@ int main(int argc, char *argv[]) {
   }
   Instance I(ins);
   ins.close();
-  
+
   vprint(1, "Instance with {} jobs and {} machines, missing operations rate {}.\n", I.n, I.m, I.r);
   if (opt.timelimit == 0.0)
     opt.timelimit = double(I.n * I.m * 5) / 1000;
@@ -106,7 +93,7 @@ int main(int argc, char *argv[]) {
     S.of_makespan = !opt.flowtime;
 
   vprint(1, "Optimizing for {}.\n", opt.flowtime ? "flowtime" : "makespan");
-  
+
   vector<Result> results;
   vector<Time> npsset;
 
@@ -122,14 +109,12 @@ int main(int argc, char *argv[]) {
 
   add_results(npsset, S.evaluateNPSset(I));
 
-  
   unsigned steps_shift = S.shift_ls();
   results.push_back(S.getResultPO());
   vprint(1, "Local search {} ", results.back().to_string());
   results.push_back(S.getResultSO());
   vprint(1, "{}\n", results.back().to_string());
 
-  
   const double pavg = double(I.totalTime()) / (I.n * I.m);
   iopt.T = iopt.alpha * pavg / 10;
   iopt.timelimit = opt.timelimit - run::elapsed();
@@ -155,7 +140,7 @@ int main(int argc, char *argv[]) {
   add_results(npsset, S.evaluateNPSset(I));
   PSolution Sf{I, S.so.π};
   add_results(npsset, Sf.evaluateNPSset(I));
-  
+
   unsigned steps_shift_np = 0;
   ENPSolution N(I, S);
   if (opt.npfs) {
