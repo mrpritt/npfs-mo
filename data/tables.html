@@ -11,7 +11,7 @@
 
 
 
-<title>Reproducing experimental data in of “Effective heuristics for permutation and non-permutation flow shop scheduling with missing operations”</title>
+<title>Reproducing experimental data of “Effective heuristics for permutation and non-permutation flow shop scheduling with missing operations”</title>
 
 <script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
 // be compatible with the behavior of Pandoc < 2.8).
@@ -1883,9 +1883,9 @@ display: none;
 
 
 
-<h1 class="title toc-ignore">Reproducing experimental data in of
-“Effective heuristics for permutation and non-permutation flow shop
-scheduling with missing operations”</h1>
+<h1 class="title toc-ignore">Reproducing experimental data of “Effective
+heuristics for permutation and non-permutation flow shop scheduling with
+missing operations”</h1>
 
 </div>
 
@@ -1898,7 +1898,7 @@ repository.</p>
 <pre class="r"><code>t2 = read_csv(here(&quot;data/table2.csv&quot;))
 tb = t2 %&gt;% mutate(epj = n*((1-d)*(1-d)+d*(1-d)*m)) %&gt;% group_by(d, n, m) %&gt;% summarise(across(epj, mean)) %&gt;% pivot_wider(names_from = d, values_from = c(epj)) %&gt;% ungroup()
 tb=bind_cols(tb[1:12,],tb[13:24,])
-tb %&gt;% kable(caption = glue(&quot;Average number of pseudo jobs of all instance groups with a different number of jobs n and machines m. Each group has 30 instances.&quot;), col.names = rep(c(&quot;$n$&quot;, &quot;$m/r$&quot;, &quot;$0.2$&quot;, &quot;$0.3$&quot;, &quot;$0.4$&quot;),2)) %&gt;% kable_styling()</code></pre>
+tb %&gt;% kable(caption = &quot;Average number of pseudo jobs of all instance groups with a different number of jobs n and machines m. Each group has 30 instances.&quot;, col.names = rep(c(&quot;$n$&quot;, &quot;$m/r$&quot;, &quot;$0.2$&quot;, &quot;$0.3$&quot;, &quot;$0.4$&quot;),2)) %&gt;% kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
 Average number of pseudo jobs of all instance groups with a different
@@ -2335,7 +2335,7 @@ bkv = read_csv(here(&quot;data/table3-bkv.csv&quot;))
 t3 = twosa %&gt;% inner_join(iga) %&gt;% inner_join(bkv) %&gt;% mutate(across(ends_with(&quot;.ft&quot;),~rd(.x,bkv))) %&gt;% group_by(d,n,m) %&gt;% summarize(across(c(saf.ft:igapols.ft),mean)) %&gt;% pivot_wider(names_from=n,values_from=c(ends_with(&quot;.ft&quot;)))
 t3.sum = t3 %&gt;% ungroup() %&gt;% summarize(across(saf.ft_5:igapols.ft_100,function(x) { mean(x,na.rm=T) }))
 t3 = t3 %&gt;% bind_rows(t3.sum)
-t3 %&gt;% kable(caption = glue(&quot;Relative deviations from the best known values for 2SA and IGA.&quot;), col.names = c(&quot;$d$&quot;, &quot;$m/n$&quot;, rep(n_names,2))) %&gt;% kable_styling()</code></pre>
+t3 %&gt;% kable(caption = &quot;Relative deviations from the best known values for 2SA and IGA.&quot;, col.names = c(&quot;$d$&quot;, &quot;$m/n$&quot;, rep(n_names,2))) %&gt;% kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
 Relative deviations from the best known values for 2SA and IGA.
@@ -2970,7 +2970,7 @@ iga = read_csv(here(&quot;data/table4-iga.csv&quot;))
 t4 = twosa %&gt;% inner_join(iga) %&gt;% rename(time.t=time) %&gt;% mutate(across(ends_with(&quot;.ft&quot;),~rd(.x,bkv))) %&gt;% group_by(n,m) %&gt;% summarize(across(c(saf.t:time.t),mean)) %&gt;% pivot_wider(names_from=n,values_from=c(ends_with(&quot;.t&quot;)))
 t4.sum = t4 %&gt;% summarize(across(saf.t_5:time.t_100,function(x) { mean(x,na.rm=T) }))
 t4 = t4 %&gt;% bind_rows(t4.sum)
-t4 %&gt;% kable(caption = glue(&quot;Computation times for 2SA and IGA.&quot;), col.names = c(&quot;$m/n$&quot;, rep(n_names,2))) %&gt;% kable_styling()</code></pre>
+t4 %&gt;% kable(caption = &quot;Computation times for 2SA and IGA.&quot;, col.names = c(&quot;$m/n$&quot;, rep(n_names,2))) %&gt;% kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
 Computation times for 2SA and IGA.
@@ -3237,7 +3237,7 @@ bkv = read_csv(here(&quot;data/table3-bkv.csv&quot;))
 t5 = mip %&gt;% inner_join(iga) %&gt;% inner_join(igap) %&gt;% inner_join(bkv) %&gt;% mutate(across(ends_with(&quot;.ft&quot;),~rd(.x,bkv))) %&gt;% group_by(n,m,d) %&gt;% summarize(across(ends_with(&quot;.ft&quot;),mean)) %&gt;% pivot_wider(names_from=n,values_from=c(ends_with(&quot;.ft&quot;)))
 t5.sum = t5 %&gt;% ungroup() %&gt;% summarize(across(contains(&quot;.ft_&quot;),function(x) { mean(x,na.rm=T) }))
 t5 = t5 %&gt;% bind_rows(t5.sum)
-t5 %&gt;% kable(caption = glue(&quot;Comparison of the solution of the MIP model with those of IGA and IGA running with a ﬁve times higher iteration limit (IGA+).&quot;), col.names = c(&quot;$m$&quot;, &quot;$d/n$&quot;, rep(n_names[1:5],3))) %&gt;% kable_styling()</code></pre>
+t5 %&gt;% kable(caption = &quot;Comparison of the solution of the MIP model with those of IGA and IGA running with a ﬁve times higher iteration limit (IGA+).&quot;, col.names = c(&quot;$m$&quot;, &quot;$d/n$&quot;, rep(n_names[1:5],3))) %&gt;% kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
 Comparison of the solution of the MIP model with those of IGA and IGA
@@ -4008,7 +4008,7 @@ ggplot(f4,aes(x=saf.t,y=time.t)) + geom_point() + geom_abline() + scale_x_log10(
 t6 = t6 %&gt;% mutate(across(ends_with(&quot;.ft&quot;),~rd(.x,bkv))) %&gt;% group_by(d,n,m) %&gt;% summarize(across(c(ends_with(&quot;.ft&quot;)),mean)) %&gt;% pivot_wider(names_from=n,values_from=c(ends_with(&quot;.ft&quot;)))
 t6.sum = t6 %&gt;% ungroup() %&gt;% summarize(across(contains(&quot;.ft_&quot;),function(x) { mean(x,na.rm=T) }))
 t6 = t6 %&gt;% bind_rows(t6.sum)
-t6 %&gt;% kable(caption = glue(&quot;Relative deviations from the best known values for IGA0 and IGA+NPSset.&quot;), col.names = c(&quot;$d$&quot;, &quot;$m/n$&quot;, rep(n_names,2))) %&gt;% kable_styling()</code></pre>
+t6 %&gt;% kable(caption = &quot;Relative deviations from the best known values for IGA0 and IGA+NPSset.&quot;, col.names = c(&quot;$d$&quot;, &quot;$m/n$&quot;, rep(n_names,2))) %&gt;% kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
 Relative deviations from the best known values for IGA0 and IGA+NPSset.
@@ -4640,7 +4640,7 @@ NA
 <pre class="r"><code>t7 = read_csv(here(&quot;data/table7.csv&quot;)) %&gt;% group_by(n,m) %&gt;% summarize(b=100*mean(bs),B=100*max(bs),jri=100*mean(jri)) %&gt;% pivot_wider(names_from=m,values_from=c(b,B,jri)) 
 t7.sum = t7 %&gt;% ungroup() %&gt;% summarize(across(contains(&quot;_&quot;),function(x) { mean(x,na.rm=T) }))
 t7 = t7 %&gt;% bind_rows(t7.sum)
-t7 %&gt;% kable(caption = glue(&quot;Average and maximum buffer sizes and job reordering index (in percent) for the non-permutation solutions.&quot;), col.names = c(&quot;$m/n$&quot;, rep(n_names[1:4],3))) %&gt;% kable_styling()</code></pre>
+t7 %&gt;% kable(caption = &quot;Average and maximum buffer sizes and job reordering index (in percent) for the non-permutation solutions.&quot;, col.names = c(&quot;$m/n$&quot;, rep(n_names[1:4],3))) %&gt;% kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
 Average and maximum buffer sizes and job reordering index (in percent)
@@ -4985,7 +4985,7 @@ NA
 <pre class="r"><code>t8 = read_csv(here(&quot;data/table8.csv&quot;)) %&gt;% group_by(n,m) %&gt;% summarize(b=100*mean(bs),B=100*max(bs),jri=100*mean(jri)) %&gt;% pivot_wider(names_from=m,values_from=c(b,B,jri))
 t8.sum = t8 %&gt;% ungroup() %&gt;% summarize(across(contains(&quot;_&quot;),function(x) { mean(x,na.rm=T) }))
 t8 = t8 %&gt;% bind_rows(t8.sum)
-t8 %&gt;% kable(caption = glue(&quot;Average and maximum buffer sizes and job reordering index (in percent) for the permutation solutions.&quot;), col.names = c(&quot;$n/m$&quot;, rep(n_names[1:4],3))) %&gt;% kable_styling()</code></pre>
+t8 %&gt;% kable(caption = &quot;Average and maximum buffer sizes and job reordering index (in percent) for the permutation solutions.&quot;, col.names = c(&quot;$n/m$&quot;, rep(n_names[1:4],3))) %&gt;% kable_styling()</code></pre>
 <table class="table" style="margin-left: auto; margin-right: auto;">
 <caption>
 Average and maximum buffer sizes and job reordering index (in percent)
