@@ -30,6 +30,7 @@ This will produce a couple of output lines. The next-to-last value in the line t
   title =   {Effective heuristics for permutation and non-permutation ﬂow shop scheduling with missing operations},
   journal = {Comp. Oper. Res.},
   year =    {2024},
-  volume =  {106742}
+  volume =  {106742},
+  doi    =  {10.1016/j.cor.2024.106742}
 }
 ```
