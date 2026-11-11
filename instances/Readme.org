@@ -1,0 +1,22 @@
+#+Title: Conventions
+
+* Naming
+
+  p_n_m_r.txt
+
+  for
+  - missing operations rate p
+  - jobs n
+  - machines m
+  - replication r
+
+* Format
+
+  numberMachines m
+  numberJobs n
+  missing Operations p
+  
+  n*m entries of the form:
+  t_i_j value
+
+  Such that `value` is the processing time of job j+1 on machine i+1.

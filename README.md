@@ -2,6 +2,10 @@
 
 This repository contains detailed results and code for the paper [Non-permutation flow shop scheduling with missing operations](https://doi.org/10.1016/j.cor.2024.106742).
 
+## Instances
+
+The 2,160 benchmark instances of Henneberg and Neufeld (2016) used in the paper are in [instances](instances), with naming and format conventions in [instances/Readme.org](instances/Readme.org).
+
 ## Detailed results
 
 The detailed results can be found in folder [data](data). In the folder you also can find a [R notebook](data/tables.Rmd) to reproduce the tables, including a [rendered version in HTML](https://raw.githack.com/mrpritt/npfs-mo/main/data/tables.html).
@@ -19,7 +23,7 @@ You will need [Boost](https://www.boost.org), and if you want to build the exact
 
 To run the experiments from the paper, for example on instance 0.2_10_05_02.txt, do the following.
 ```bash
-./npfsmo --flowtime --timelimit -1 --iterfactor 0.1 --npfs 0.2_10_05_02.txt
+./npfsmo --flowtime --timelimit -1 --iterfactor 0.1 --npfs ../instances/0.2_10_05_02.txt
 ```
 This will produce a couple of output lines. The next-to-last value in the line tagged INFO is the flowtime found by the IGA. By default all parameters are fixed to the settings of the paper, and the random seed is fixed to 1. Therefore, since the stopping criterion is the number of iterations, and not time, you should be able to exactly reproduce the values from the tables.
 
